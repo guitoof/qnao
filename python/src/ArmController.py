@@ -1,4 +1,6 @@
 #!/usr/bin python
+# -*- coding: utf-8 -*-
+
 
 __author__ = 'guillaumediallo-mulliez'
 
@@ -8,15 +10,26 @@ import time
 from naoqi import ALProxy
 
 class ArmController:
-    """This class will control the motion of the robot arm to make it realize the different actions"""
-    # Motion proxy #
-    #ALProxy motionProxy
-
-    # Joint names #
-    jointNames = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll"]
+    """
+        This class will control the motion of the robot arm to make it realize the different actions
+        Actions are movements of the arm in the following directions :
+            * Up : -45° LShoulderPitch
+            * Down : +45° LShoulderPitch
+            * Left : +20° LShoulderRoll
+            * Right : -20° LShoulderRoll
+            * Stay
+        Arm movement is therefore constraint within the following range :
+            * Horizontal range : [-20° +20°]
+            * Vertical range : [-45° +45°]
+    """
 
     # Arm states #
-    armState = [0,  25, 0, -30]
+    armState = { 'LShoulderPitch' : 0, 'LShoulderRoll' : 0 }
+
+    # Movement steps
+    step = { 'vertical' : 45, 'horizontal' : 20 }
+    # Movement boundaries #
+    boudaries = { 'top' : -45, 'bottom' : 45, 'left' : 20, 'right' : -20 }
 
     # Motion fraction speed
     pFractionMaxSpeed = 0.3
@@ -30,24 +43,22 @@ class ArmController:
             print "Error was: ", e
 
         # Init robot arm to center position
-        #print("Initializing arm to center state ")
-        newArmState = [ x * motion.TO_RAD for x in self.armState]
-        #self.motionProxy.angleInterpolationWithSpeed(self.jointNames, self.armState, self.pFractionMaxSpeed)
+        print("Initializing arm to center state ")
+        self.resetArmPosition()
 
 
-    def do(self, action):
-        newArmState = self.armState
-        if ( action == "up" ):
-            newArmState[0] += 45
-        elif ( action == "down" ):
-            newArmState[0] -= 45
-        elif ( action == "left" ):
-            newArmState[1] += 10
-        elif ( action == "right" ):
-            newArmState[1] -= 10
-        if (newArmState[0] >= -45 and newArmState[0] <= 45 and newArmState[1] >= 10 and newArmState[1] <= 40 ):
-            newArmState = [ x * motion.TO_RAD for x in newArmState]
-            print("Arm is moving ", action)
-            self.motionProxy.angleInterpolationWithSpeed(self.jointNames, newArmState, self.pFractionMaxSpeed)
-        time.sleep(1.0)
+    def resetArmPosition(self):
+        self.armState = { 'LShoulderPitch' : 0, 'LShoulderRoll' : 0 }
+        armPosition = [ x * motion.TO_RAD for x in self.armState.values()]
+        self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.pFractionMaxSpeed)
+
+    def move(self, direction):
+        if ( direction == 'up' ):
+            self.armState['LShoulderPitch'] = min( self.boudaries['top'], self.armState['LShoulderPitch'] - self.step['vertical'] )
+        elif ( direction == 'down' ):
+            self.armState['LShoulderPitch'] = max( self.boundaries['bottom'], self.armState['LShoulderPitch'] + self.step['vertical'] )
+        elif ( direction == 'left' ):
+            self.armState['LShoulderRoll'] = max( self.boundaries['left'], self.armState['LShoulderRoll'] + self.step['horizontal'] )
+        elif ( direction == 'right' ):
+            self.armState['LShoulderRoll'] = min( self.boudaries['top'], self.armState['LShoulderRoll'] - self.step['horizontal'] )
 
