@@ -3,17 +3,17 @@
 ip = "169.254.51.192"
 port = 9559
 
-import arm_controller
+import ArmController
 from naoqi import ALProxy
 
 ####### Init proxies #######
 
 # Make robot stand if not standing
-#stand()
+stand()
 
 
-armController = arm_controller.ArmController(ip, port)
-armController.do("left")
+#armController = arm_controller.ArmController(ip, port)
+#armController.do("left")
 
 def stand(self):
     # Posture proxy #
