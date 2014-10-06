@@ -9,13 +9,13 @@ classdef ActionsStates
       end
    end
    enumeration
-      UpLeft (1, -1)
+      %UpLeft (1, -1)
       Up (1, 0)
-      UpRight (1, 1)
+      Down(-1, 0)
+      %UpRight (1, 1)
       Left (0, -1)
       Right (0, 1)
-      DownLeft (-1, -1)
-      Down (-1, 0)
-      DownRight (-1, 1)
+      %DownLeft (-1, -1)
+      %DownRight (-1, 1)
    end
 end

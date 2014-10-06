@@ -13,6 +13,9 @@ classdef Actions
          possibilities = Actions.pickPossibleActions(currentState);
          action = possibilities{randi(size(possibilities, 1), 1, 1)};
       end
+      function action = pickGreedyAction(currentState, QRow, epsilon)
+          action = 1
+      end
       function possibilities = pickPossibleActions(currentState);
          possibilities = num2cell(enumeration('ActionsStates'));
          vFilter = cellfun(@(x)ne(currentState.vertical, x.vertical)||eq(currentState.vertical, 0), possibilities);
