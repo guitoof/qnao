@@ -10,16 +10,13 @@ from naoqi import ALModule
 #include <alproxies/alspeechrecognitionproxy.h>
 #include <alproxies/almemoryproxy.h>
 
-# to add in main :
-ALSpeechRecognitionProxy::setWordListAsVocabulary("words to be recognized")
 
-
-class RewardModule(ALModule):
+class RewardModule(ALModule, ALSpeechRecognitionProxy):
 	'reward class for NAO'
 
 	# Global variable to store the HumanGreeter module instance
 	memory = None
-	reward = 5 ;
+	_reward = 5 ;
 
 	# Constructor 
 	def __init__():
@@ -34,14 +31,19 @@ class RewardModule(ALModule):
         global memory
         memory = ALProxy("ALMemory")
         memory.subscribeToEvent("RearTactilTouched",
-            "Reward",
+            "RewardModule",
             "onRearTactilTouched")
 
+
+        # choose language and words to be recognized during init
+		ALSpeechRecognitionProxy::setLanguage('French')
+		ALSpeechRecognitionProxy::setVocabulary("pas du tout", true)
+
 		# Subscribe to the WordRecognized event:
-        global memory2
+		global memory2
         memory2 = ALProxy("ALMemory")
         memory2.subscribeToEvent("WordRecognized",
-            "Reward",
+            "RewardModule",
             "onWordRecognized")
 
 
@@ -49,10 +51,10 @@ class RewardModule(ALModule):
 
 	# methods
 	def getReward():
-		return reward 
+		return _reward 
 
 	def setReward(value):
-		reward = value
+		_reward = value
 
 
 
@@ -60,29 +62,31 @@ class RewardModule(ALModule):
 	def onRearTactilTouched(self, *_args):
 		# Unsubscribe to the event to avoid repetitions
 		memory.unsubscribeToEvent("RearTactilTouched",
-            "Reward")
+            "RewardModule")
 
 		self.tts.say("Hello, reward has been updated to one, thank you !")
-		reward = 1
+		self._reward = 1
 
         # Subscribe again to the event
         memory.subscribeToEvent(("RearTactilTouched",
-            "Reward",
+            "RewardModule",
             "onRearTactilTouched")
+        pass
 
 
 	def onWordRecognized(self, *_args):
 		# Unsubscribe to the event to avoid repetitions
 		memory2.unsubscribeToEvent("WordRecognized",
-            "Reward")
+            "RewardModule")
 
 		self.tts.say("Hello, reward has been updated to zero, I am so sorry !")
-		reward = 0
+		self._reward = -1
 		
 		 # Subscribe again to the event
         memory.subscribeToEvent(("WordRecognized",
-            "Reward",
+            "RewardModule",
             "onWordRecognized")		
+        pass
 
 
 
