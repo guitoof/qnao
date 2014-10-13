@@ -33,7 +33,7 @@ class ArmController:
     boundaries = { 'top' : -45, 'bottom' : 45, 'left' : 20, 'right' : -20 }
 
     # Motion fraction speed
-    pFractionMaxSpeed = 0.3
+    pFractionMaxSpeed = 0.16
 
 
     def __init__(self, robotIp, robotPort):
