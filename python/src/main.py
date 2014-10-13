@@ -6,7 +6,7 @@ port = 9559
 from ArmController import ArmController
 from naoqi import ALProxy
 import time
-
+import reward
 
 def stand():
     # Posture proxy #
