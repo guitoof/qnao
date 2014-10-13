@@ -3,10 +3,13 @@
 ip = "169.254.51.192"
 port = 9559
 
-from ArmController import ArmController
 from naoqi import ALProxy
+
+from ArmController import ArmController
+from Reward import RewardModule
+
 import time
-import reward
+
 
 def stand():
     # Posture proxy #
@@ -16,7 +19,7 @@ def stand():
         print "Could not create proxy to ALRobotPosture"
         print "Error was: ", e
 
-    postureProxy.goToPosture("StandInit", 0.5)
+    postureProxy.goToPosture("StandInit", 0.2)
 
 ####### Init proxies #######
 
@@ -26,7 +29,7 @@ def stand():
 
 armController = ArmController(ip, port)
 
-#time.sleep(2)
+time.sleep(1)
 
-#armController.move('left')
+armController.move('down')
 
