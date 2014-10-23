@@ -53,26 +53,31 @@ class ArmController:
     def resetArmPosition(self):
         self.resetArmState()
         armPos = [x * motion.TO_RAD for x in self.armState.values()]
-        self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPos, self.fracSpeed)
+        mp = self.motionProxy
+        jointNames = self.armState.keys()
+        mp.angleInterpolationWithSpeed(jointNames, armPos, self.fracSpeed)
 
     def move(self, direction):
-        #print self.armState['LShoulderPitch'], " and ", self.armState['LShoulderRoll']
-        if ( direction == 'up' ):
-            self.armState['LShoulderPitch'] = min( self.boundaries['top'], self.armState['LShoulderPitch'] - self.step['vertical'] )
-        elif ( direction == 'down' ):
-            self.armState['LShoulderPitch'] = max( self.boundaries['bottom'], self.armState['LShoulderPitch'] + self.step['vertical'] )
-        elif ( direction == 'left' ):
-            self.armState['LShoulderRoll'] = max( self.boundaries['left'], self.armState['LShoulderRoll'] + self.step['horizontal'] )
-        elif ( direction == 'right' ):
-            self.armState['LShoulderRoll'] = min( self.boundaries['right'], self.armState['LShoulderRoll'] - self.step['horizontal'] )
-        armPosition = [ x * motion.TO_RAD for x in self.armState.values()]
-        ret = self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.pFractionMaxSpeed)
+        shoulderPitch = self.armState['LShoulderPitch']
+        shoulderRoll = self.armState['LShoulderRoll']
+        vertStep = self.step['vertical']
+        horStep = self.step['horizontal']
+        if (direction == 'up'):
+            self.armState['LShoulderPitch'] = min(self.boundaries['top'], shoulderPitch - vertStep)
+        elif (direction == 'down'):
+            self.armState['LShoulderPitch'] = max(self.boundaries['bottom'], shoulderPitch + vertStep)
+        elif (direction == 'left'):
+            self.armState['LShoulderRoll'] = max(self.boundaries['left'], shoulderRoll + horStep)
+        elif (direction == 'right'):
+            self.armState['LShoulderRoll'] = min(self.boundaries['right'], shoulderRoll - horStep)
+        armPosition = [x * motion.TO_RAD for x in self.armState.values()]
+        ret = self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.fracSpeed)
         print ret
         print self.armState['LShoulderPitch'], " and ", self.armState['LShoulderRoll']
         print 'Moving ', direction
-        
+
     def moveToState(self, state):
-        self.armState['LShoulderPitch'] = self.boundaries['top']*state.vertical_pos;
-        self.armState['LShoulderRoll'] = self.boundaries['right']*state.horizontal_pos;
-        armPosition = [ x * motion.TO_RAD for x in self.armState.values()]
-        ret = self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.pFractionMaxSpeed)
+        self.armState['LShoulderPitch'] = self.boundaries['top']*state.vertical_pos
+        self.armState['LShoulderRoll'] = self.boundaries['right']*state.horizontal_pos
+        armPosition = [x * motion.TO_RAD for x in self.armState.values()]
+        ret = self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.fracSpeed)

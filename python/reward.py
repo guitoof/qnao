@@ -9,7 +9,8 @@ from naoqi import ALBroker
 from naoqi import ALModule
 
 # Global variable to store the HumanGreeter module instance
-#memory = None
+# memory = None
+
 
 class Reward(ALModule):
 
