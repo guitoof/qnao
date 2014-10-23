@@ -19,6 +19,7 @@ class State(Enum):
 
     def position_index(self):
         return 3*(-self.vertical_pos+1)+self.horizontal_pos+1
+        
     @staticmethod
     def state_from_array(array):
         states = list(State)

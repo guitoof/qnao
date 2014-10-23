@@ -9,9 +9,11 @@ import motion
 import time
 from naoqi import ALProxy
 
+
 class ArmController:
     """
-        This class will control the motion of the robot arm to make it realize the different actions
+        This class will control the motion of the robot arm
+        to make it realize the different actions.
         Actions are movements of the arm in the following directions :
             * Up : -45° LShoulderPitch
             * Down : +45° LShoulderPitch
@@ -24,17 +26,16 @@ class ArmController:
     """
 
     # Arm states #
-    #armState = { 'LShoulderPitch' : 0, 'LShoulderRoll' : 0 }
+    # armState = { 'LShoulderPitch' : 0, 'LShoulderRoll' : 0 }
     armState = {}
 
     # Movement steps
-    step = { 'vertical' : 45, 'horizontal' : 20 }
+    step = {'vertical': 45, 'horizontal': 20}
     # Movement boundaries #
-    boundaries = { 'top' : -45, 'bottom' : 45, 'left' : 20, 'right' : -20 }
+    boundaries = {'top': -45, 'bottom': 45, 'left': 20, 'right': -20}
 
     # Motion fraction speed
-    pFractionMaxSpeed = 0.16
-
+    fracSpeed = 0.16
 
     def __init__(self, robotIp, robotPort):
         try:
@@ -43,17 +44,16 @@ class ArmController:
             print 'Could not create proxy to ALMotion'
             print 'Error was: ', e
 
-        # Init robot arm to center position
-        print("Initializing arm to center state ")
-        #self.resetArmPosition()
-
     def resetArmState(self):
-        self.armState = { 'LShoulderPitch' : 0, 'LShoulderRoll' : 0, 'LElbowYaw' : 0, 'LElbowRoll' : 0 }
+        self.armState = {'LShoulderPitch': 0,
+                         'LShoulderRoll': 0,
+                         'LElbowYaw': 0,
+                         'LElbowRoll': 0}
 
     def resetArmPosition(self):
         self.resetArmState()
-        armPosition = [ x * motion.TO_RAD for x in self.armState.values()]
-        self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.pFractionMaxSpeed)
+        armPos = [x * motion.TO_RAD for x in self.armState.values()]
+        self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPos, self.fracSpeed)
 
     def move(self, direction):
         #print self.armState['LShoulderPitch'], " and ", self.armState['LShoulderRoll']

@@ -14,7 +14,13 @@ class QLearning(object):
 
     def init_experiment(self):
       self.postureProxy = ALProxy("ALRobotPosture", self.naoIP, self.naoPort)
+      except Exception, e:
+        print 'Could not create proxy to ALRobotPosture'
+        print 'Error was: ', e
       self.motionProxy = ALProxy("ALMotion", self.naoIP, self.naoPort)
+      except Exception, e:
+        print 'Could not create proxy to ALMotion'
+        print 'Error was: ', e
       self.motionProxy.wakeUp();
       self.postureProxy.goToPosture("Stand", 0.5)
 
