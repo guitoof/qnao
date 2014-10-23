@@ -1,13 +1,13 @@
 #!/usr/bin python
 
-ip = "169.254.204.42"
+ip = "169.254.51.92"
 NAO_IP = "nao.local"
 port = 9559
 
 from naoqi import ALProxy
 
-from ArmController import ArmController
-from Reward import Reward
+from armcontroller import ArmController
+from reward import Reward
 
 from naoqi import ALBroker
 from optparse import OptionParser
@@ -24,7 +24,7 @@ def stand():
         print "Could not create proxy to ALRobotPosture"
         print "Error was: ", e
 
-    postureProxy.goToPosture("Sit", 0.5)
+    postureProxy.goToPosture("Stand", 0.5)
 
 ####### Init proxies #######
 

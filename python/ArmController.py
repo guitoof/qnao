@@ -45,7 +45,7 @@ class ArmController:
 
         # Init robot arm to center position
         print("Initializing arm to center state ")
-        self.resetArmPosition()
+        #self.resetArmPosition()
 
     def resetArmState(self):
         self.armState = { 'LShoulderPitch' : 0, 'LShoulderRoll' : 0, 'LElbowYaw' : 0, 'LElbowRoll' : 0 }
@@ -72,8 +72,7 @@ class ArmController:
         print 'Moving ', direction
         
     def moveToState(self, state):
-        self.armState['LSholderPitch'] = self.boundaries['top']*state.vertical_pos;
-        self.armState['LSholderRoll'] = self.boundaries['right']*state.horizontal_pos;
+        self.armState['LShoulderPitch'] = self.boundaries['top']*state.vertical_pos;
+        self.armState['LShoulderRoll'] = self.boundaries['right']*state.horizontal_pos;
         armPosition = [ x * motion.TO_RAD for x in self.armState.values()]
         ret = self.motionProxy.angleInterpolationWithSpeed(self.armState.keys(), armPosition, self.pFractionMaxSpeed)
-        print 'Arm moved to ', state.name
