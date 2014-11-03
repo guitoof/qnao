@@ -79,9 +79,11 @@ class QLearning(object):
                 self.tts.say("Comme ça ?")
 
                 reward_module.subscribe_to_events()
-                
+
                 while (not(reward_module.value)):
                     time.sleep(1)
+
+                print reward_module.success_memory.getOutputNames()
 
                 current_reward = reward_module.value
                 if current_reward == 1:
