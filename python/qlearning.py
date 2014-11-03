@@ -8,6 +8,10 @@ from policies import Policies
 from armcontroller import ArmController
 from naoqi import ALProxy
 from reward import Reward
+from naoqi import ALBroker
+
+reward_module = Reward("reward_module", "nao_broker", "169.254.51.192", 9559)
+
 
 class QLearning(object):
     "QLearning main class"
@@ -66,9 +70,9 @@ class QLearning(object):
                 next_state = State.state_from_array(next_state)
                 self.armController.moveToState(next_state)
                 print "Moving %s" % action.name
-                
+
                 reward_module.subscribe_to_events()
-                
+
                 while (not(reward_module.value)):
                     time.sleep(1)
 
