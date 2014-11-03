@@ -28,10 +28,14 @@ class Reward(ALModule):
         ALModule.__init__(self, _name)
         self.positive_memory = ALProxy("ALMemory")
         self.negative_memory = ALProxy("ALMemory")
+        self.success_memory = ALProxy("ALSpeechRecognition")
+        print self.success_memory.getLanguage()
 
     def subscribe_to_events(self):
         self.positive_memory.subscribeToEvent( "FrontTactilTouched", self.name, "onFrontTactilTouched" )
         self.negative_memory.subscribeToEvent( "RearTactilTouched", self.name, "onRearTactilTouched" )
+        self.success_memory.subscribe(self.name)
+        #self.success_memory.subscribe("success_memory")
 
     def unsubscribe_to_events(self):
         self.positive_memory.unsubscribeToEvent("FrontTactilTouched", self.name)
