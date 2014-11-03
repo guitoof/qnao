@@ -16,9 +16,9 @@ class Policies(object):
     def epsilon_greedy(self, state, QRow):
         if (random.random() < self.epsilon):
             return self.random(state, QRow)
-        return self.best_action(state, QRow)
+        return self.optimal(state, QRow)
 
-    def best_action(self, state, QRow):
+    def optimal(self, state, QRow):
         possible_actions_indexes = [action.value for action in Action.possible_actions(state)]
         filtered_q = {i: QRow[i] for i in possible_actions_indexes}
         keys = filtered_q.keys()

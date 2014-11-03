@@ -30,18 +30,18 @@ class Reward(ALModule):
         self.negative_memory = ALProxy("ALMemory")
         self.success_memory = ALProxy("ALSpeechRecognition")
         wordList=["test","bonjour","Bravo"]
-        #self.success_memory.setWordListAsVocabulary( "test", "bravo", "bonjour")
+        self.success_memory.setVocabulary(wordList)
 
     def subscribe_to_events(self):
         self.positive_memory.subscribeToEvent( "FrontTactilTouched", self.name, "onFrontTactilTouched" )
         self.negative_memory.subscribeToEvent( "RearTactilTouched", self.name, "onRearTactilTouched" )
-        self.success_memory.subscribe(self.name)
+        self.success_memory.subscribe("success_event")
 
 
     def unsubscribe_to_events(self):
         self.positive_memory.unsubscribeToEvent("FrontTactilTouched", self.name)
         self.negative_memory.unsubscribeToEvent("RearTactilTouched", self.name)
-        self.success_memory.unsubscribe(self.name)
+        self.success_memory.unsubscribe("success_event")
 
     def reset(self):
         self.value = 0

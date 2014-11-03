@@ -110,10 +110,11 @@ class QLearning(object):
         for state in states:
             self.armController.moveToState(state)
             current_state = state
-            self.tts.say("Regarde bien comment je vais arriver %s depuis cette position")
+            goal_sentence = "Regarde bien comment je vais arriver %s depuis cette position" % self.goal_state.french_label()
+            self.tts.say(goal_sentence)
             while (current_state != self.goal_state):
                 action = policy(current_state, self.Q[state.position_index()])
-                next_state = np.array(state.value)+action.get_2D_offset()
+                next_state = np.array(current_state.value)+action.get_2D_offset()
                 current_state = State.state_from_array(next_state)
                 self.armController.moveToState(current_state)
             self.tts.say("Pas mal, hein ?")
@@ -139,5 +140,5 @@ reward_module = Reward("reward_module", "nao_broker", args.naoIP, args.naoPort)
 
 qlearning.init_experiment()
 qlearning.launch_experiment()
-qlearning.show_results()
+#qlearning.show_results()
 qlearning.end_experiment()
