@@ -100,7 +100,24 @@ class QLearning(object):
         print self.Q
         self.tts.say("On a terminé tout le monde. Regarde la matrice Q que j'ai craché à l'écran")
 
+    def show_results(self):
+        states = list(State)
+        states.remove(self.goal_state)
+        policies = Policies(self.epsilon)
+        policy = getattr(policies, "optimal")
+        for state in states:
+            self.armController.moveToState(state)
+            current_state = state
+            self.tts.say("Regarde bien comment je vais arriver %s depuis cette position")
+            while (current_state != self.goal_state):
+                action = policy(current_state, self.Q[state.position_index()])
+                next_state = np.array(state.value)+action.get_2D_offset()
+                current_state = State.state_from_array(next_state)
+                self.armController.moveToState(current_state)
+            self.tts.say("Pas mal, hein ?")
+
     def end_experiment(self):
+        self.tts.say("On dirait bien qu'on a terminé, je vais me coucher à présent")
         self.postureProxy.goToPosture("Sit", 0.5)
         self.motionProxy.rest()
 
@@ -113,11 +130,12 @@ parser.add_argument("--alpha", default=0.2, type=float, help='Learning rate (bet
 parser.add_argument("--gamma", default=0.9, type=float, help='Discount Factor (between 0.0 and 1.0) which trades off the importance of sooner versus later rewards')
 parser.add_argument("--epsilon", default=0.1, type=float, help='Epsilon-greedy parameter (between 0.0 and 1.0) giving the probability of picking a random action')
 parser.add_argument("--N", default=5, type=int, help='Number of rounds (the initial position of the robot changes after each new round)')
-parser.add_argument("--policy", default="epsilon_greedy", choices=['random', 'epsilon_greedy'], help='Picked policy (random or epsilon-greedy)', dest='policy_name')
+parser.add_argument("--policy", default="epsilon_greedy", choices=['random', 'epsilon_greedy', 'optimal'], help='Picked policy (random or epsilon-greedy)', dest='policy_name')
 args = parser.parse_args(namespace=qlearning)
 
 reward_module = Reward("reward_module", "nao_broker", args.naoIP, args.naoPort)
 
 qlearning.init_experiment()
 qlearning.launch_experiment()
+qlearning.show_results()
 qlearning.end_experiment()
