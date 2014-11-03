@@ -1,3 +1,5 @@
+# -*- encoding: UTF-8 -*-
+
 from enum import Enum
 
 
@@ -16,6 +18,26 @@ class State(Enum):
     def __init__(self, vertical_pos, horizontal_pos):
         self.vertical_pos = vertical_pos
         self.horizontal_pos = horizontal_pos
+
+    def french_label(self):
+        if self == State.UpLeft:
+            return "en haut à gauche."
+        if self == State.Up:
+            return "en haut au milieu."
+        if self == State.UpRight:
+            return "en haut à droite."
+        if self == State.Left:
+            return "à gauche."
+        if self == State.Center:
+            return "au centre."
+        if self == State.Right:
+            return "à droite."
+        if self == State.DownLeft:
+            return "en bas à gauche."
+        if self == State.Down:
+            return "en bas au milieu."
+        if self == State.DownRight:
+            return "en bas à droite."
 
     def position_index(self):
         return 3*(-self.vertical_pos+1)+self.horizontal_pos+1
