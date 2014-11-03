@@ -1,6 +1,6 @@
 #!/usr/bin python
 
-ip = "169.254.51.92"
+ip = "169.254.51.192"
 NAO_IP = "nao.local"
 port = 9559
 
