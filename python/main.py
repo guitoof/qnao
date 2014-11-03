@@ -15,7 +15,6 @@ from optparse import OptionParser
 import sys
 import time
 
-
 def stand():
     # Posture proxy #
     try:
@@ -57,7 +56,6 @@ goodMemory = ALProxy("ALMemory")
 goodMemory.subscribeToEvent( "FrontTactilTouched", "rewardModule", "onFrontTactilTouched" )
 badMemory = ALProxy("ALMemory")
 badMemory.subscribeToEvent( "RearTactilTouched", "rewardModule", "onRearTactilTouched" )
-
 
 try:
     while True:

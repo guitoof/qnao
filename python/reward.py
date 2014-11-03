@@ -15,29 +15,52 @@ from naoqi import ALModule
 class Reward(ALModule):
 
     value = 0
+    event_received = False
+
+    def __init__(self, _name, broker_name, nao_ip, nao_port):
+        self.name = _name
+        broker = ALBroker(broker_name, 
+                     "0.0.0.0", # Listen to anyone
+                     0,         # Find a free port and use it
+                     nao_ip,
+                     nao_port)
+        
+        ALModule.__init__(self, _name)
+        self.positive_memory = ALProxy("ALMemory")
+        self.negative_memory = ALProxy("ALMemory")
+        self.BIND_PYTHON(_name, self.onFrontTactilTouched.__name__)
+
+    def subscribe_to_events(self):
+        self.positive_memory.subscribeToEvent( "FrontTactilTouched", self.name, "onFrontTactilTouched" )
+        self.negative_memory.subscribeToEvent( "RearTactilTouched", self.name, "onRearTactilTouched" )
+
+    def unsubscribe_to_events(self):
+        self.positive_memory.unsubscribeToEvent("FrontTactilTouched", self.name)
+        self.negative_memory.unsubscribeToEvent("RearTactilTouched", self.name)
+
+    def reset(self):
+        self.value = 0
+        self.event_received = False
+        self.unsubscribe_to_events()
 
     def positiveReward(self):
-        print "Receiving congratulation (+1 reward)"
-        self.value += 1
+        self.value = 1
+        self.event_received = True
 
     def negativeReward(self):
-        print "Receiving punishment (-1 reward)"
-        self.value -= 1
+        self.value = -1
+        self.event_received = True
 
     def onFrontTactilTouched(self, *_args):
         """
             Callback method for FrontTactilTouched event
         """
-
-        self.positiveReward()
-        print "Total reward is ", self.value
-        pass
+        if not(self.event_received):
+            self.positiveReward()
 
     def onRearTactilTouched(self, *_args):
         """
             Callback method for RearTactilTouched event
         """
-
-        self.negativeReward()
-        print "Total reward is ", self.value
-        pass
+        if not(self.event_received):
+            self.negativeReward()

@@ -18,7 +18,7 @@ class Policies(object):
             return self.random(state, QRow)
         possible_actions_indexes = [action.value for action in Action.possible_actions(state)]
         filtered_q = {i: QRow[i] for i in possible_actions_indexes}
-        keys = filtered_q_keys()
+        keys = filtered_q.keys()
         max_filtered_q = max(filtered_q.values())
         optimal_action_indexes = [k for k in keys if filtered_q[k] == max_filtered_q]
         return Action(random.choice(optimal_action_indexes))

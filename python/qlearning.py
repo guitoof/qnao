@@ -2,10 +2,14 @@ import argparse
 from state import State
 import numpy as np
 import random
+import time
 from policies import Policies
 from armcontroller import ArmController
 from naoqi import ALProxy
+from reward import Reward
+from naoqi import ALBroker
 
+reward_module = Reward("reward_module", "nao_broker", "169.254.222.162", 9559)
 
 class QLearning(object):
     "QLearning main class"
@@ -14,11 +18,13 @@ class QLearning(object):
         self.Q = np.zeros((9, 4))
 
     def init_experiment(self):
-        self.postureProxy = ALProxy("ALRobotPosture", self.naoIP, self.naoPort)
+        try:
+            self.postureProxy = ALProxy("ALRobotPosture", self.naoIP, self.naoPort)
         except Exception, e:
             print 'Could not create proxy to ALRobotPosture'
             print 'Error was: ', e
-        self.motionProxy = ALProxy("ALMotion", self.naoIP, self.naoPort)
+        try:
+            self.motionProxy = ALProxy("ALMotion", self.naoIP, self.naoPort)
         except Exception, e:
             print 'Could not create proxy to ALMotion'
             print 'Error was: ', e
@@ -51,10 +57,19 @@ class QLearning(object):
                 next_state = State.state_from_array(next_state)
                 self.armController.moveToState(next_state)
                 print "Moving %s" % action.name
-                reward = int(input("Enter a reward: "))
+                
+                reward_module.subscribe_to_events()
+                
+                while (not(reward_module.value)):
+                    time.sleep(1)
+
+                current_reward = reward_module.value
+
+                reward_module.reset()
+
                 current_Q = self.Q[state.position_index(), action.value]
                 max_Q = np.amax(self.Q[next_state.position_index()])
-                self.Q[state.position_index(), action.value] += self.alpha*(reward+self.gamma*max_Q-current_Q)
+                self.Q[state.position_index(), action.value] += self.alpha*(current_reward+self.gamma*max_Q-current_Q)
                 state = next_state
                 print "Now at %s position (goal %s)" % (state.name, self.goal_state.name)
             print ""
@@ -65,11 +80,12 @@ class QLearning(object):
         self.motionProxy.rest()
 
 
+
 def main():
     qlearning = QLearning()
 
     parser = argparse.ArgumentParser(description='Launches QLearning Experiment with the Nao Robot.')
-    parser.add_argument("--naoIP", help="IP of the Nao Robot", default="169.254.51.192")
+    parser.add_argument("--naoIP", help="IP of the Nao Robot", default="169.254.222.162")
     parser.add_argument("--naoPort", help="Port of the Nao Robot", type=int, default=9559)
     parser.add_argument("--alpha", default=0.2, type=float, help='Learning rate (between 0.0 and 1.0)')
     parser.add_argument("--gamma", default=0.9, type=float, help='Discount Factor (between 0.0 and 1.0) which trades off the importance of sooner versus later rewards')
