@@ -26,22 +26,23 @@ class Reward(ALModule):
                      nao_port)
 
         ALModule.__init__(self, _name)
-        self.positive_memory = ALProxy("ALMemory")
-        self.negative_memory = ALProxy("ALMemory")
-        self.success_memory = ALProxy("ALSpeechRecognition")
-        wordList=["test","bonjour","Bravo"]
-        self.success_memory.setVocabulary(wordList)
+        self.memory = ALProxy("ALMemory")
+        self.speechRecognizer = ALProxy("ALSpeechRecognition")
+        for subscriber in self.speechRecognizer.getSubscribersInfo():
+            self.speechRecognizer.unsubscribe(subscriber[0])
+        vocabulary=["bravo"]
+        self.speechRecognizer.setVocabulary(vocabulary, False)
 
     def subscribe_to_events(self):
-        self.positive_memory.subscribeToEvent( "FrontTactilTouched", self.name, "onFrontTactilTouched" )
-        self.negative_memory.subscribeToEvent( "RearTactilTouched", self.name, "onRearTactilTouched" )
-        self.success_memory.subscribe("success_event")
+        self.memory.subscribeToEvent( "FrontTactilTouched", self.name, "onFrontTactilTouched" )
+        self.memory.subscribeToEvent( "RearTactilTouched", self.name, "onRearTactilTouched" )
+        self.speechRecognizer.subscribe("success_event")
 
 
     def unsubscribe_to_events(self):
-        self.positive_memory.unsubscribeToEvent("FrontTactilTouched", self.name)
-        self.negative_memory.unsubscribeToEvent("RearTactilTouched", self.name)
-        self.success_memory.unsubscribe("success_event")
+        self.memory.unsubscribeToEvent("FrontTactilTouched", self.name)
+        self.memory.unsubscribeToEvent("RearTactilTouched", self.name)
+        self.speechRecognizer.unsubscribe("success_event")
 
     def reset(self):
         self.value = 0
@@ -54,6 +55,10 @@ class Reward(ALModule):
 
     def negativeReward(self):
         self.value = -1
+        self.event_received = True
+
+    def successReward(self):
+        self.value = 10
         self.event_received = True
 
     def onFrontTactilTouched(self, *_args):

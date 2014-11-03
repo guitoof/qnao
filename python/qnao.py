@@ -14,6 +14,7 @@ from naoqi import ALBroker
 from qlearning import QLearning
 import config
 
+
 reward_module = None
 
 class QLearning(object):
@@ -105,10 +106,10 @@ class QLearning(object):
 
                 reward_module.subscribe_to_events()
 
-                while (not(reward_module.value)):
+                while (not(reward_module.value) and (reward_module.memory.getData("WordRecognized")[1] < 0.4)):
                     time.sleep(1)
-
-                print reward_module.success_memory.getOutputNames()
+                if (reward_module.memory.getData("WordRecognized")[1] >= 0.4 ):
+                    reward_module.successReward()
 
                 current_reward = reward_module.value
                 if current_reward == 1:
