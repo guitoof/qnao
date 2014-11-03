@@ -1,5 +1,6 @@
 # -*- encoding: UTF-8 -*-
 
+import argparse
 from state import State
 import numpy as np
 import random
@@ -10,8 +11,10 @@ from naoqi import ALProxy
 from reward import Reward
 from naoqi import ALBroker
 
-reward_module = Reward("reward_module", "nao_broker", "169.254.51.192", 9559)
+from qlearning import QLearning
+import config
 
+reward_module = None
 
 class QLearning(object):
     "QLearning main class"
@@ -23,8 +26,8 @@ class QLearning(object):
         try:
             self.tts = ALProxy("ALTextToSpeech", self.naoIP, self.naoPort)
             self.tts.setLanguage("French")
-            self.tts.say("Bonjour tout le monde, je m'appelle Nao !")
-            self.tts.say("J'aimerais qu'on apprenne une nouvelle position ensemble !")
+            self.tts.say("Bonjour tout le monde, je m'appelle Nao")
+            self.tts.say("J'aimerais tant qu'on apprenne une nouvelle position ensemble")
         except Exception, e:
             print 'Could not create proxy to ALTextToSpeech'
             print 'Error was: ', e
@@ -51,7 +54,7 @@ class QLearning(object):
         policies = Policies(self.epsilon)
         self.policy = getattr(policies, self.policy_name)
         self.goal_state = random.choice(list(State))
-        goal_sentence = "J'aimerais que tu m'apprennes à placer mon bras %s !" % self.goal_state.french_label()
+        goal_sentence = "J'aimerais que tu m'apprennes à placer mon bras %s" % self.goal_state.french_label()
         self.tts.say(goal_sentence)
 
         print "The Goal State is %s" % self.goal_state.name
@@ -64,19 +67,27 @@ class QLearning(object):
             state = random.choice(states)
             self.armController.moveToState(state)
             print "Starting Round %d at %s position" % (i, state.name)
+            self.tts.say("Commençons ainsi")
+            time.sleep(1)
+
             while (state != self.goal_state):
                 action = self.policy(state, self.Q[state.position_index()])
                 next_state = np.array(state.value)+action.get_2D_offset()
                 next_state = State.state_from_array(next_state)
                 self.armController.moveToState(next_state)
                 print "Moving %s" % action.name
+                self.tts.say("Comme ça ?")
 
                 reward_module.subscribe_to_events()
-
+                
                 while (not(reward_module.value)):
                     time.sleep(1)
 
                 current_reward = reward_module.value
+                if current_reward == 1:
+                    self.tts.say("C'est super")
+                elif current_reward == -1:
+                    self.tts.say("Zut alors")
                 reward_module.reset()
 
                 current_Q = self.Q[state.position_index(), action.value]
@@ -85,8 +96,28 @@ class QLearning(object):
                 state = next_state
                 print "Now at %s position (goal %s)" % (state.name, self.goal_state.name)
             print ""
+            self.tts.say("Incroyable, j'ai réussi on dirait")
         print self.Q
+        self.tts.say("On a terminé tout le monde. Regarde la matrice Q que j'ai craché à l'écran")
 
     def end_experiment(self):
         self.postureProxy.goToPosture("Sit", 0.5)
         self.motionProxy.rest()
+
+qlearning = QLearning()
+
+parser = argparse.ArgumentParser(description='Launches QLearning Experiment with the Nao Robot.')
+parser.add_argument("--naoIP", help="IP of the Nao Robot", default="169.254.51.192")
+parser.add_argument("--naoPort", help="Port of the Nao Robot", type=int, default=9559)
+parser.add_argument("--alpha", default=0.2, type=float, help='Learning rate (between 0.0 and 1.0)')
+parser.add_argument("--gamma", default=0.9, type=float, help='Discount Factor (between 0.0 and 1.0) which trades off the importance of sooner versus later rewards')
+parser.add_argument("--epsilon", default=0.1, type=float, help='Epsilon-greedy parameter (between 0.0 and 1.0) giving the probability of picking a random action')
+parser.add_argument("--N", default=5, type=int, help='Number of rounds (the initial position of the robot changes after each new round)')
+parser.add_argument("--policy", default="epsilon_greedy", choices=['random', 'epsilon_greedy'], help='Picked policy (random or epsilon-greedy)', dest='policy_name')
+args = parser.parse_args(namespace=qlearning)
+
+reward_module = Reward("reward_module", "nao_broker", "169.254.51.192", 9559)
+
+qlearning.init_experiment()
+qlearning.launch_experiment()
+qlearning.end_experiment()
