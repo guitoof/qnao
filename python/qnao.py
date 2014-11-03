@@ -71,7 +71,6 @@ class QLearning(object):
             self.tts.say("Commençons ainsi")
             time.sleep(1)
 
-            success = False
             while (state != self.goal_state):
                 action = self.policy(state, self.Q[state.position_index()])
                 next_state = np.array(state.value)+action.get_2D_offset()
@@ -85,8 +84,7 @@ class QLearning(object):
                 while (not(reward_module.value) and (reward_module.memory.getData("WordRecognized")[1] < 0.4)):
                     time.sleep(1)
                 if (reward_module.memory.getData("WordRecognized")[1] >= 0.4 ):
-                    success = True
-                #print len(reward_module.memory.WordRecognized)
+                    reward_module.successReward()
 
                 current_reward = reward_module.value
                 if current_reward == 1:
@@ -101,10 +99,9 @@ class QLearning(object):
                 state = next_state
                 print "Now at %s position (goal %s)" % (state.name, self.goal_state.name)
             print ""
-            if success :
-                self.tts.say("Incroyable, j'ai réussi on dirait")
-                print self.Q
-                self.tts.say("On a terminé tout le monde. Regarde la matrice Q que j'ai craché à l'écran")
+            self.tts.say("Incroyable, j'ai réussi on dirait")
+        print self.Q
+        self.tts.say("On a terminé tout le monde. Regarde la matrice Q que j'ai craché à l'écran")
 
     def show_results(self):
         states = list(State)
@@ -143,6 +140,6 @@ args = parser.parse_args(namespace=qlearning)
 reward_module = Reward("reward_module", "nao_broker", args.naoIP, args.naoPort)
 
 qlearning.init_experiment()
-#qlearning.launch_experiment()
+qlearning.launch_experiment()
 #qlearning.show_results()
 qlearning.end_experiment()

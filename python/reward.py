@@ -57,6 +57,10 @@ class Reward(ALModule):
         self.value = -1
         self.event_received = True
 
+    def successReward(self):
+        self.value = 10
+        self.event_received = True
+
     def onFrontTactilTouched(self, *_args):
         """
             Callback method for FrontTactilTouched event
