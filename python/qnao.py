@@ -107,8 +107,8 @@ class QLearning(object):
 qlearning = QLearning()
 
 parser = argparse.ArgumentParser(description='Launches QLearning Experiment with the Nao Robot.')
-parser.add_argument("--naoIP", help="IP of the Nao Robot", default="169.254.51.192")
-parser.add_argument("--naoPort", help="Port of the Nao Robot", type=int, default=9559)
+parser.add_argument("--naoIP", help="IP of the Nao Robot", default=config.nao_ip)
+parser.add_argument("--naoPort", help="Port of the Nao Robot", type=int, default=config.nao_port)
 parser.add_argument("--alpha", default=0.2, type=float, help='Learning rate (between 0.0 and 1.0)')
 parser.add_argument("--gamma", default=0.9, type=float, help='Discount Factor (between 0.0 and 1.0) which trades off the importance of sooner versus later rewards')
 parser.add_argument("--epsilon", default=0.1, type=float, help='Epsilon-greedy parameter (between 0.0 and 1.0) giving the probability of picking a random action')
@@ -116,7 +116,7 @@ parser.add_argument("--N", default=5, type=int, help='Number of rounds (the init
 parser.add_argument("--policy", default="epsilon_greedy", choices=['random', 'epsilon_greedy'], help='Picked policy (random or epsilon-greedy)', dest='policy_name')
 args = parser.parse_args(namespace=qlearning)
 
-reward_module = Reward("reward_module", "nao_broker", "169.254.51.192", 9559)
+reward_module = Reward("reward_module", "nao_broker", args.naoIP, args.naoPort)
 
 qlearning.init_experiment()
 qlearning.launch_experiment()
