@@ -3,6 +3,25 @@ qnao
 
 Q-Learning experiment on Nao robot
 
+Running the Experiment
+======================
+
+To acquire the code, simply run the command :
+
+    git clone https://github.com/Guitoof/qnao
+    cd qnao
+
+After plugging in the robot to the computer, make sure that the IP and port match the robot's in `python/config.py`.
+
+To get the list of parameters and the help, one can run the following command :
+
+    python qnao.py --help
+    
+Finally, to run the experiment (for instance with a custom value of epsilon):
+
+    python qnao.py --epsilon 0.8
+
+
 Licence
 =======
 This program is free software: you can redistribute it and/or modify
