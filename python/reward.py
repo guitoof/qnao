@@ -5,11 +5,7 @@ import sys
 import time
 
 from naoqi import ALProxy
-from naoqi import ALBroker
 from naoqi import ALModule
-
-# Global variable to store the HumanGreeter module instance
-# memory = None
 
 
 class Reward(ALModule):
@@ -17,14 +13,8 @@ class Reward(ALModule):
     value = 0
     event_received = False
 
-    def __init__(self, _name, broker_name, nao_ip, nao_port):
+    def __init__(self, _name):
         self.name = _name
-        broker = ALBroker(broker_name,
-                     "0.0.0.0", # Listen to anyone
-                     0,         # Find a free port and use it
-                     nao_ip,
-                     nao_port)
-
         ALModule.__init__(self, _name)
         self.memory = ALProxy("ALMemory")
         self.speechRecognizer = ALProxy("ALSpeechRecognition")

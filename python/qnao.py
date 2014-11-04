@@ -10,8 +10,8 @@ from armcontroller import ArmController
 from naoqi import ALProxy
 from reward import Reward
 from naoqi import ALBroker
+import sys
 
-from qlearning import QLearning
 import config
 
 
@@ -106,9 +106,9 @@ class QLearning(object):
 
                 reward_module.subscribe_to_events()
 
-                while (not(reward_module.value) and (reward_module.memory.getData("WordRecognized")[1] < 0.4)):
+                while (not(reward_module.value) and (reward_module.memory.getData("WordRecognized")[1] < 0.35)):
                     time.sleep(1)
-                if (reward_module.memory.getData("WordRecognized")[1] >= 0.4 ):
+                if (reward_module.memory.getData("WordRecognized")[1] >= 0.35 ):
                     reward_module.successReward()
 
                 current_reward = reward_module.value
@@ -174,9 +174,23 @@ parser.add_argument("--N", default=5, type=int, help='Number of rounds (the init
 parser.add_argument("--policy", default="epsilon_greedy", choices=['random', 'epsilon_greedy', 'optimal'], help='Picked policy (random or epsilon-greedy)', dest='policy_name')
 args = parser.parse_args(namespace=qlearning)
 
-reward_module = Reward("reward_module", "nao_broker", args.naoIP, args.naoPort)
 
-qlearning.init_experiment()
-qlearning.launch_experiment()
-qlearning.show_results()
-qlearning.end_experiment()
+broker = ALBroker("nao_broker",
+                     "0.0.0.0", # Listen to anyone
+                     0,         # Find a free port and use it
+                     args.naoIP,
+                     args.naoPort)
+
+global reward_module
+reward_module = Reward("reward_module")
+
+try:
+    qlearning.init_experiment()
+    qlearning.launch_experiment()
+    qlearning.show_results()
+except KeyboardInterrupt:
+    print "Stopping the experiment..."
+finally:
+    qlearning.end_experiment()
+    broker.shutdown()
+    sys.exit(0)
