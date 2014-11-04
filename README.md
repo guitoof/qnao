@@ -6,10 +6,10 @@ Q-Learning experiment on Nao robot
 Running the Experiment
 ======================
 
-To acquire the code, simply run the command :
+To acquire the code and get ready to run the experiment, simply run the commands :
 
     git clone https://github.com/Guitoof/qnao
-    cd qnao
+    cd qnao/python
 
 After plugging in the robot to the computer, make sure that the IP and port match the robot's in `python/config.py`.
 
